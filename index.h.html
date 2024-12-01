@@ -1,66 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberShield Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Leaflet.js CSS for the map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GamieCoin Converter</title>
+  <style>
+    /* CSS Styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 400px;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+      color: #333333;
+    }
+    .balance p {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .balance span {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .form-group {
+      margin: 20px 0;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .form-group button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .form-group button:hover {
+      background-color: #0056b3;
+    }
+    .transaction-history {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .transaction-history h2 {
+      font-size: 18px;
+      color: #333;
+    }
+    .transaction-history ul {
+      list-style: none;
+      padding: 0;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+    }
+    .transaction-history li {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>CyberShield Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="#overview">Overview</a></li>
-                <li><a href="#threats">Threats</a></li>
-                <li><a href="#map-section">Attack Map</a></li>
-            </ul>
-        </nav>
-    </header>
+  <div class="container">
+    <h1>GamieCoin Converter</h1>
+    <div class="balance">
+      <p><strong>Naira Balance:</strong> ₦<span id="naira-balance">0</span></p>
+      <p><strong>GamieCoin Balance:</strong> <span id="gamiecoin-balance">0</span></p>
+    </div>
+    <div class="form-group">
+      <input type="number" id="amount" placeholder="Enter Naira amount">
+      <button onclick="addNaira()">Add Naira</button>
+    </div>
+    <div class="form-group">
+      <button onclick="convertToGamieCoin()">Convert to GamieCoin</button>
+    </div>
+    <div class="transaction-history">
+      <h2>Transaction History</h2>
+      <ul id="history"></ul>
+    </div>
+  </div>
 
-    <!-- Intro Section -->
-    <section id="intro" class="section">
-        <h2>Welcome to CyberShield</h2>
-        <p>
-            CyberShield is a real-time cybersecurity monitoring dashboard that helps you stay 
-            informed about potential cyber threats and attacks globally. From tracking system statuses 
-            to visualizing simulated cyberattacks on a world map, CyberShield provides a powerful tool 
-            to monitor and manage your cybersecurity defenses.
-        </p>
-    </section>
+  <script>
+    // JavaScript Logic
+    let nairaBalance = 0;
+    let gamieCoinBalance = 0;
+    const conversionRate = 500; // 1 GamieCoin = ₦500
 
-    <main>
-        <!-- Overview Section -->
-        <section id="overview" class="section">
-            <h2>System Overview</h2>
-            <div class="status-card">
-                <h3>Firewall</h3>
-                <p>Status: <span id="firewall-status">Healthy</span></p>
-            </div>
-            <div class="status-card">
-                <h3>Network Traffic</h3>
-                <p>Status: <span id="network-status">Warning</span></p>
-            </div>
-        </section>
+    function addNaira() {
+      const amount = parseFloat(document.getElementById("amount").value);
+      if (!isNaN(amount) && amount > 0) {
+        nairaBalance += amount;
+        document.getElementById("naira-balance").textContent = nairaBalance.toFixed(2);
+        logTransaction(`Added ₦${amount.toFixed(2)} to balance.`);
+        document.getElementById("amount").value = ""; // Clear input
+      } else {
+        alert("Please enter a valid Naira amount.");
+      }
+    }
 
-        <!-- Threats Section -->
-        <section id="threats" class="section">
-            <h2>Threat Detection</h2>
-            <ul id="threat-list"></ul>
-        </section>
+    function convertToGamieCoin() {
+      if (nairaBalance >= conversionRate) {
+        const coins = Math.floor(nairaBalance / conversionRate);
+        gamieCoinBalance += coins;
+        nairaBalance -= coins * conversionRate;
+        document.getElementById("naira-balance").textContent = nairaBalance.toFixed(2);
+        document.getElementById("gamiecoin-balance").textContent = gamieCoinBalance;
+        logTransaction(`Converted ₦${coins * conversionRate} to ${coins} GamieCoins.`);
+      } else {
+        alert("Not enough Naira to convert!");
+      }
+    }
 
-        <!-- Map Section -->
-        <section id="map-section" class="section">
-            <h2>Cyber Attack Map</h2>
-            <div id="map"></div>
-        </section>
-    </main>
-
-    <!-- Leaflet.js for the map -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- Your JavaScript file -->
-    <script src="script.js"></script>
+    function logTransaction(message) {
+      const history = document.getElementById("history");
+      const listItem = document.createElement("li");
+      listItem.textContent = message;
+      history.appendChild(listItem);
+    }
+  </script>
 </body>
 </html>
